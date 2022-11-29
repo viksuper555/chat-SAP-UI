@@ -1,19 +1,23 @@
 import { Injectable } from "@angular/core";
 import { EventEmitter } from "@angular/core";
-import { MessageBody } from "./app.component";
+import {MessageBody, RegisterBody} from "./app.component";
 
 @Injectable({
   providedIn: "root"
 })
 export class SocketService {
-  private socket: WebSocket;
+  private socket!: WebSocket;
   private listener: EventEmitter<any> = new EventEmitter();
+  private username?: string
+  public constructor() {}
 
-  public constructor() {
-
+  public initialize(username:string){
+    this.username = username
     this.socket = new WebSocket("ws://localhost:9000/ws");
     this.socket.onopen = event => {
-      this.listener.emit({ type: "open", data: event });
+      this.listener.emit({ type: "open", data: event});
+      let rb:RegisterBody = {username: username}
+      this.socket.send(JSON.stringify(rb));
     };
     this.socket.onclose = event => {
       this.listener.emit({ type: "close", data: event });
@@ -21,6 +25,8 @@ export class SocketService {
     this.socket.onmessage = event => {
       this.listener.emit({ type: "message", data: JSON.parse(event.data) });
     };
+
+    return true;
   }
 
   public send(data: MessageBody) {

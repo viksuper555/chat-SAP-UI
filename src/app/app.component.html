@@ -1,15 +1,25 @@
 <div>
+  Online buddies: {{ onlineUsers }}
+</div>
+<div>
   <div>
     <div>
-      <input [(ngModel)]="myId"
+      <div>UUID: {{uuid}}</div>
+      <input [(ngModel)]="username"
              type="text"
-             placeholder="SenderId.">
+             placeholder="Please enter username.">
     </div>
-    <br>
+  </div>
+  <button (click)="register()">Register</button>
+  <button (click)="login()">Login</button>
+</div>
+<br>
+<div *ngIf="connected">
+  <div>
     <input [(ngModel)]="message"
            type="text"
            placeholder="Write message.">
-    </div>
+  </div>
 
   <button (click)="sendMessage()">Send Message</button>
 </div>
