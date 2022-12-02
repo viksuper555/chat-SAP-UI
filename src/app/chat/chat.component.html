@@ -1,0 +1,66 @@
+<div class="container py-5 px-4">
+  <div class="row rounded-lg overflow-hidden shadow">
+    <!-- Users box-->
+    <div class="col-5 px-0">
+      <div class="bg-white">
+
+        <div class="bg-gray px-4 py-2 bg-light">
+          <p class="h5 mb-0 py-1">Recent</p>
+        </div>
+
+        <div class="messages-box">
+          <div class="list-group rounded-0">
+            <div *ngFor="let room of rooms">
+              <a class="list-group-item list-group-item-action rounded-0" [ngClass]="(room==activeRoom)?'active text-white':'list-group-item-light'">
+                <div class="media"><img src="/assets/room_icon.png" alt="user" width="50" class="rounded-circle">
+                  <div class="media-body ml-4">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                      <h6 class="mb-0">{{ room }}</h6><small class="small font-weight-bold">25 Dec</small>
+                    </div>
+                    <p class="font-italic mb-0 text-small">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Chat Box-->
+    <div class="col-7 px-0">
+      <div class="px-4 py-5 chat-box bg-white">
+        <!-- Sender Message-->
+        <div *ngFor="let item of messageItems">
+          <div class="media w-50 mb-3" [ngClass]="item.sentByMe?'ml-auto margin-left':'flex'">
+            <div *ngIf="!item.sentByMe">
+              <img src="/assets/user_icon.png" alt="user" width="50" class="rounded-circle" style="margin-right: 16px" >
+              <div class="flex" style="align-items:baseline">
+                <span [ngClass]="(onlineUsers.includes(item.user)?'online':'')"></span>
+                <p style="padding-right: 16px;text-align: center;"> {{ item.user }}</p>
+              </div>
+            </div>
+            <div class="media-body" [ngClass]="item.sentByMe?'':'ml-3'">
+              <div class="rounded py-2 px-3 mb-2 wrap" [ngClass]="item.sentByMe?'bg-primary':'bg-light'">
+                <p class="text-small mb-0" [ngClass]="item.sentByMe?'text-white':'text-muted'">{{ item.message }}</p>
+              </div>
+              <p class="small text-muted">{{ item.dateStr }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-light">
+          <div class="input-group">
+            <input id="send-Input" [(ngModel)]="message" (keydown.enter)='sendMessage()' type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light">
+            <div class="input-group-append">
+              <button (click)="sendMessage()" type="button" class="btn btn-link" [disabled]="!message"> <i class="fa fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div>
+    Online buddies: {{ onlineUsers }}
+  </div>
+</div>
