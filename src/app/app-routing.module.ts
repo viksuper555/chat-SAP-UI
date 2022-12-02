@@ -8,7 +8,7 @@ const routes: Routes = [
   { path: 'auth', title:'Login to messenger', component: AuthComponent },
   { path: '', redirectTo: '/auth', pathMatch: 'full' },
   { path: 'chat', title:'Messenger', component: ChatComponent },
-  // { path: '**', component: PageNotFoundComponent }
+  { path: '**', redirectTo: '/auth' },
 ];
 
 @NgModule({

@@ -7,7 +7,7 @@ import {MessageBody, User} from "./models";
 })
 export class SocketService {
   private socket!: WebSocket;
-  private listener?: EventEmitter<any>;
+  private listener!: EventEmitter<any>;
   private loginId?: string
   public constructor() {}
 
@@ -17,17 +17,17 @@ export class SocketService {
     this.socket = new WebSocket("ws://localhost:9000/ws");
     this.socket.onopen = event => {
       console.log('Socket open')
-      this.listener!.emit({ type: "open", data: event});
+      this.listener.emit({ type: "open", data: event});
       let rb:User = {uuid: loginId}
       this.socket.send(JSON.stringify(rb));
     };
     this.socket.onclose = event => {
       console.log('Socket closing')
-      this.listener!.emit({ type: "close", data: event });
+      this.listener.emit({ type: "close", data: event });
       this.close()
     };
     this.socket.onmessage = event => {
-      this.listener!.emit({ type: "message", data: JSON.parse(event.data) });
+      this.listener.emit({ type: "message", data: JSON.parse(event.data) });
     };
   }
 
@@ -37,10 +37,10 @@ export class SocketService {
 
   public close() {
     this.socket.close();
-    this.listener!.complete();
+    this.listener.complete();
   }
 
   public getEventListener() {
-    return this.listener!;
+    return this.listener;
   }
 }

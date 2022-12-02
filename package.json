@@ -22,6 +22,7 @@
     "bootstrap": "^5.2.3",
     "jquery": "^3.6.1",
     "jquery-slim": "^3.0.0",
+    "core-js": "^2.5.7",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"
