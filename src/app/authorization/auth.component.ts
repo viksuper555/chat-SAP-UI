@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {SocketService} from "../socket.service";
 import {DatePipe} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormControl, FormGroup, NgForm} from "@angular/forms";
 import {IMessageItem, User} from "../models";
 import {DataService} from "../data.service";
 import {Subscription} from "rxjs";
@@ -16,12 +16,10 @@ import {Subscription} from "rxjs";
 
 
 export class AuthComponent {
-  public testUser:User = {
-    uuid:'ffa5302b-cc5f-4c60-803f-6e94d9c5335d',
-    username: 'Viktor'
-  }
-  public user:User = this.testUser;
+  public user:User = {uuid:'ffa5302b-cc5f-4c60-803f-6e94d9c5335d'};
   private subscription?: Subscription;
+  public registerUserId?:string;
+
   constructor(
     private httpClient: HttpClient,
     private socketService:SocketService,
@@ -50,17 +48,15 @@ export class AuthComponent {
 
   @Output() submitEM = new EventEmitter();
 
-  async register(){
-    if (!this.user?.username)
-      alert('Please enter username.')
-
+  async register(form: NgForm){
+    this.user.username = form.value.username
     var body: User = {
       username: this.user!.username
     }
     this.httpClient.post<User>('/api/register', body)
       .subscribe(
         next => {
-          console.log(next)
+          this.registerUserId = next?.uuid
           this.user.uuid = next?.uuid || ""
           alert("Successfully registered.")
         },

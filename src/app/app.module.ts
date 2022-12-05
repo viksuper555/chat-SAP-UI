@@ -12,6 +12,7 @@ import {MatCardModule} from "@angular/material/card";
 import {MaterialModule} from "./material.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {DataService} from "./data.service";
+import {ClipboardModule} from "@angular/cdk/clipboard";
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import {DataService} from "./data.service";
     ReactiveFormsModule,
     MatCardModule,
     MaterialModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ClipboardModule
   ],
   providers: [DatePipe, DataService],
   bootstrap: [AppComponent]

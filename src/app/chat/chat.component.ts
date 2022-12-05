@@ -15,17 +15,17 @@ export class ChatComponent {
   public user!:User;
   public recipients = <string[]>[];
   public onlineUsers = <string[]>[];
-  // public messageItems = <IMessageItem[]>[];
+  public messageItems = <IMessageItem[]>[];
   //region MI
-  public messageItems:IMessageItem[] = [{
-    user: "Viktor",
-    message: "asdgfasdgasdfasdfasdfasdfaasdgfasdgasdfasdfasdfasdfasdfsadfsdfsaasdgfasdgasdfasdfasdfasdfasdfsadfdf",
-    sentByMe: true
-  },{
-    user: "Ivan",
-    message: "asdgfasdgasdfasdfasdfasdfaasdgfasdgasdfasdfasdfasdfasdfsadfsdfsaasdgfasdgasdfasdfasdfasdfasdfsadfdf",
-    sentByMe: false
-  }]
+  // public messageItems:IMessageItem[] = [{
+  //   user: "Viktor",
+  //   message: "asdgfasdgasdfasdfasdfasdfaasdgfasdgasdfasdfasdfasdfasdfsadfsdfsaasdgfasdgasdfasdfasdfasdfasdfsadfdf",
+  //   sentByMe: true
+  // },{
+  //   user: "Ivan",
+  //   message: "asdgfasdgasdfasdfasdfasdfaasdgfasdgasdfasdfasdfasdfasdfsadfsdfsaasdgfasdgasdfasdfasdfasdfasdfsadfdf",
+  //   sentByMe: false
+  // }]
   //endregion
   public activeRoom = "Global Room";
   public rooms = ["Global Room", "VP Room"]
@@ -100,6 +100,7 @@ export class ChatComponent {
       message: this.message
     };
     this.socketService.send(msg)
+    this.message = ''
   }
 
 }

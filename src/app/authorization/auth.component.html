@@ -1,26 +1,27 @@
-<div>
-  <div>
-    <div>
-      <input [(ngModel)]="user.username"
-             type="text"
-             placeholder="Please enter username.">
-      <br>
-      <input [(ngModel)]="user.uuid"
-             type="text"
-             placeholder="Please enter login token.">
-    </div>
-  </div>
-  <button (click)="register()">Register</button>
-  <button (click)="login()">Login</button>
-</div>
+<!--<div>-->
+<!--  <div>-->
+<!--    <div>-->
+<!--      <input [(ngModel)]="user.username"-->
+<!--             type="text"-->
+<!--             placeholder="Please enter username.">-->
+<!--      <br>-->
+<!--      <input [(ngModel)]="user.uuid"-->
+<!--             type="text"-->
+<!--             placeholder="Please enter login token.">-->
+<!--    </div>-->
+<!--  </div>-->
+<!--&lt;!&ndash;  <button (click)="register()">Register</button>&ndash;&gt;-->
+<!--  <button (click)="login()">Login</button>-->
+<!--</div>-->
 <div>
   <mat-card>
     <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="register()">
+      <form #regForm="ngForm" (ngSubmit)="register(regForm)">
         <p>
           <mat-form-field>
+            <br>
             <mat-label>Username</mat-label>
-            <input matInput type="password">
+            <input name="username" ngModel required #username="ngModel" matInput>
           </mat-form-field>
         </p>
 
@@ -36,14 +37,18 @@
     </mat-card-content>
   </mat-card>
 </div>
+<div *ngIf="user.uuid">
+  {{registerUserId}}
+</div>
 <div>
 <mat-card>
   <mat-card-content>
     <form [formGroup]="form" (ngSubmit)="login()">
       <p>
-        <mat-form-field>
+        <mat-form-field >
+          <br>
           <mat-label>Login token</mat-label>
-          <input matInput type="password">
+          <input name="uuid" ngModel required #uuid="ngModel" matInput>
         </mat-form-field>
       </p>
 

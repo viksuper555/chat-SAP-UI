@@ -27,3 +27,48 @@ mat-card-content {
   display: flex;
   justify-content: flex-end;
 }
+.input_copy_wrapper{
+  width: 450px;
+  padding: 50px;
+  margin : 0 auto;
+}
+.input_copy {
+  padding: 15px 25px;
+  background: #ffffff;
+  border: 2px solid #aaa;
+  color: #00b9f2;
+  font-size: .8em;
+}
+
+.input_copy .icon {
+  display: block;
+  max-width: 25px;
+  cursor: pointer;
+  float: right;
+}
+
+.input_copy .icon img{
+  max-width: 25px;
+}
+.input_copy .txt {
+  width: 80%;
+  display: inline-block;
+  overflow: hidden;
+}
+
+
+.flashBG {
+  animation-name: flash;
+  animation-timing-function: ease-out;
+  animation-duration: 1s;
+}
+
+@keyframes flash {
+  0% {
+    background: #6d6d6d;
+  }
+  100% {
+    background: transparent;
+  }
+}
+
