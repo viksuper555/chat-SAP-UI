@@ -1,6 +1,6 @@
 export interface User{
-  uuid?:string
-  username?:string,
+  id?:string
+  name?:string,
 }
 
 export interface IMessageItem{

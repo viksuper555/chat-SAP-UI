@@ -11,15 +11,14 @@ export class SocketService {
   private loginId?: string
   public constructor() {}
 
-  public initialize(loginId:string){
+  public initialize(u:User){
     this.listener = new EventEmitter();
-    this.loginId = loginId
+    this.loginId = u.id //TODO: Delete this
     this.socket = new WebSocket("ws://localhost:9000/ws");
     this.socket.onopen = event => {
       console.log('Socket open')
       this.listener.emit({ type: "open", data: event});
-      let rb:User = {uuid: loginId}
-      this.socket.send(JSON.stringify(rb));
+      this.socket.send(JSON.stringify({user:u}));
     };
     this.socket.onclose = event => {
       console.log('Socket closing')

@@ -1,30 +1,33 @@
-<!--<div>-->
-<!--  <div>-->
-<!--    <div>-->
-<!--      <input [(ngModel)]="user.username"-->
-<!--             type="text"-->
-<!--             placeholder="Please enter username.">-->
-<!--      <br>-->
-<!--      <input [(ngModel)]="user.uuid"-->
-<!--             type="text"-->
-<!--             placeholder="Please enter login token.">-->
-<!--    </div>-->
-<!--  </div>-->
-<!--&lt;!&ndash;  <button (click)="register()">Register</button>&ndash;&gt;-->
-<!--  <button (click)="login()">Login</button>-->
-<!--</div>-->
 <div>
   <mat-card>
     <mat-card-content>
       <form #regForm="ngForm" (ngSubmit)="register(regForm)">
-        <p>
+        <div *ngIf="user?.id">
+          <p>
+            <mat-form-field>
+              <br>
+              <mat-label>Username</mat-label>
+              <input ngModel readonly value="{{user.name}}" matInput>
+            </mat-form-field>
+          </p>
+          <p>
+            <mat-form-field>
+              <br>
+              <mat-label>Token</mat-label>
+              <input ngModel readonly value="{{user.id}}" matInput>
+            </mat-form-field>
+          </p>
+
+        </div>
+        <div *ngIf="!user?.id">
+        <p style="margin-top: 88px">
           <mat-form-field>
             <br>
             <mat-label>Username</mat-label>
             <input name="username" ngModel required #username="ngModel" matInput>
           </mat-form-field>
         </p>
-
+        </div>
         <p *ngIf="error" class="error">
           {{ error }}
         </p>
@@ -32,23 +35,26 @@
         <div class="button">
           <button type="submit" mat-button>Register</button>
         </div>
-
       </form>
     </mat-card-content>
   </mat-card>
 </div>
-<div *ngIf="user.uuid">
-  {{registerUserId}}
-</div>
 <div>
 <mat-card>
   <mat-card-content>
-    <form [formGroup]="form" (ngSubmit)="login()">
+    <form #loginForm="ngForm"  (ngSubmit)="login(loginForm)">
+      <p>
+        <mat-form-field>
+          <br>
+          <mat-label>Username</mat-label>
+          <input name="username" ngModel required #username="ngModel" matInput>
+        </mat-form-field>
+      </p>
       <p>
         <mat-form-field >
           <br>
           <mat-label>Login token</mat-label>
-          <input name="uuid" ngModel required #uuid="ngModel" matInput>
+          <input name="uuid" ngModel required type="password" #uuid="ngModel" matInput>
         </mat-form-field>
       </p>
 

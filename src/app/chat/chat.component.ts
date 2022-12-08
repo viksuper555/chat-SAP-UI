@@ -56,15 +56,13 @@ export class ChatComponent {
       .subscribe((value:{ type: string, data: object }) => {
         if (value.type == 'message'){
           let data = JSON.parse(value.data.toString())
-          console.log(data)
-
           switch (data.type){
             case 'message':
             {
               let msg: IMessageItem = {
                 user: data.sender_id,
                 message: data.message,
-                sentByMe: data.sender_id == this.user.username,
+                sentByMe: data.sender_id == this.user.name,
                 dateStr: this.datepipe.transform(new Date(data.timestamp*1000), 'HH:MM | MMM dd')!,
               }
               this.messageItems.push(msg)
@@ -73,12 +71,7 @@ export class ChatComponent {
             }
             case 'online':
             {
-              this.onlineUsers = data.users.filter((obj: string | undefined) => {return obj !== this.user.username})
-              break;
-            }
-            case 'login':
-            {
-              this.user.username = data.username
+              this.onlineUsers = data.users.filter((obj: string | undefined) => {return obj !== this.user.name})
               break;
             }
             case 'error':

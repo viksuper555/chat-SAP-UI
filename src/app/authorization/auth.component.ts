@@ -16,9 +16,8 @@ import {Subscription} from "rxjs";
 
 
 export class AuthComponent {
-  public user:User = {uuid:'ffa5302b-cc5f-4c60-803f-6e94d9c5335d'};
+  public user:User = {};
   private subscription?: Subscription;
-  public registerUserId?:string;
 
   constructor(
     private httpClient: HttpClient,
@@ -49,15 +48,15 @@ export class AuthComponent {
   @Output() submitEM = new EventEmitter();
 
   async register(form: NgForm){
-    this.user.username = form.value.username
-    var body: User = {
-      username: this.user!.username
+    this.user.name = form.value.username
+    var u: User = {
+      name: this.user!.name
     }
-    this.httpClient.post<User>('/api/register', body)
+    this.httpClient.post<User>('/api/register', {user:u})
       .subscribe(
         next => {
-          this.registerUserId = next?.uuid
-          this.user.uuid = next?.uuid || ""
+          this.user.id = next?.id || ""
+          this.user.name = next?.name || ""
           alert("Successfully registered.")
         },
         error => {
@@ -65,10 +64,16 @@ export class AuthComponent {
         })
   }
 
-  async login(){
-    if (!this.user?.uuid)
-      alert('Please enter login token.')
-    this.socketService.initialize(this.user.uuid!)
+  async login(form: NgForm){
+    if (!form.value.uuid || !form.value.username)
+    {
+      alert('Please enter credentials.')
+      return
+    }
+    this.user.id = form.value.uuid
+    this.user.name = form.value.username
+
+    this.socketService.initialize(this.user)
     this.subscription = this.socketService.getEventListener()
       .subscribe(async (value: { type: string, data: object }) => {
         if (value.type == 'message') {
@@ -77,7 +82,7 @@ export class AuthComponent {
 
           switch (data.type) {
             case 'login': {
-              this.user.username = data.username
+              this.user = data.user
               await this.router.navigate(['chat']);
               break;
             }
