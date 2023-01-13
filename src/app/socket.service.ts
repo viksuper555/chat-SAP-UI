@@ -30,6 +30,7 @@ export class SocketService {
       this.router.navigate(['auth'])
     };
     this.socket.onmessage = event => {
+      console.log('Message: ', JSON.parse(event.data))
       this.listener.emit({ type: "message", data: JSON.parse(event.data) });
     };
   }

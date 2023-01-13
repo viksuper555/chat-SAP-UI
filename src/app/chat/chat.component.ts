@@ -22,7 +22,7 @@ export class ChatComponent {
   public message = ''
   public user!:User;
   public recipients = <string[]>[];
-  public onlineUsers = <string[]>[];
+  public onlineUsers = new Set<number>();
   public messageItems = <IMessageItem[]>[];
   //region MI
   // public messageItems:IMessageItem[] = [{
@@ -49,6 +49,7 @@ export class ChatComponent {
     if (this.dataService.user)
     {
       this.user = this.dataService.user
+      this.onlineUsers = new Set(this.dataService.online_user_ids!)
       this.socketService = this.dataService.socketService
       this.subscribeToMessages()
     }
@@ -68,10 +69,11 @@ export class ChatComponent {
             {
               var data = (value.data as IMessagePayload)
               let msg: IMessageItem = {
-                user: data.sender_name,
+                sender_id: data.sender_id,
+                sender_name: data.sender_name,
                 message: data.message,
-                sentByMe: data.sender_name == this.user.username,
-                dateStr: this.datepipe.transform(new Date(data.timestamp*1000), 'HH:MM | MMM dd')!,
+                sentByMe: data.sender_id == this.user.id,
+                dateStr: this.datepipe.transform(new Date(data.timestamp*1000), 'HH:mm | MMM dd')!,
                 hub_id: 'test',
               }
               this.messageItems.push(msg)
@@ -80,8 +82,12 @@ export class ChatComponent {
             }
             case 'online':
             {
-              var users = (value.data as IOnlinePayload).users
-              this.onlineUsers = users.filter((obj: string | undefined) => {return obj !== this.user.username})
+              let user_id = (value.data as IOnlinePayload).user_id;
+              if(user_id != this.user.id)
+              if ((value.data as IOnlinePayload).connected)
+                this.onlineUsers.add(user_id)
+              else
+                this.onlineUsers.delete(user_id)
               break;
             }
             case 'error':

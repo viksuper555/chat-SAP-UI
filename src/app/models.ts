@@ -5,7 +5,8 @@ export interface User{
 }
 
 export interface IMessageItem{
-  user: string
+  sender_id: number
+  sender_name: string
   message: string
   sentByMe: boolean
   dateStr?: string,
@@ -26,13 +27,14 @@ export interface IErrorPayload extends ISocketPayload{
   message: string
 }
 
-export interface IUserPayload extends ISocketPayload{
+export interface ILoginData extends ISocketPayload{
   user: User
+  online_user_ids: number[]
 }
 
 export interface IMessagePayload extends ISocketPayload{
-  id: number,
   type: string,
+  sender_id: number,
   sender_name: string,
   timestamp: number,
   message: string,
@@ -40,5 +42,6 @@ export interface IMessagePayload extends ISocketPayload{
 }
 
 export interface IOnlinePayload extends ISocketPayload{
-  users: string[]
+  user_id: number
+  connected: boolean
 }

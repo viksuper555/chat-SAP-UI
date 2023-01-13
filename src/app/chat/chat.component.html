@@ -38,8 +38,8 @@
             <div *ngIf="!item.sentByMe">
               <img src="/assets/user_icon.png" alt="user" width="50" class="rounded-circle" style="margin-right: 16px" >
               <div class="flex" style="align-items:baseline">
-                <span [ngClass]="(onlineUsers.includes(item.user)?'online':'')"></span>
-                <p style="padding-right: 16px;text-align: center;"> {{ item.user }}</p>
+                <span [ngClass]="(onlineUsers.has(item.sender_id)?'online':'')"></span>
+                <p style="padding-right: 16px;text-align: center;"> {{ item.sender_name }}</p>
               </div>
             </div>
             <div class="media-body" [ngClass]="item.sentByMe?'':'ml-3'">

@@ -4,7 +4,7 @@ import {SocketService} from "../socket.service";
 import {DatePipe} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormControl, FormGroup, NgForm} from "@angular/forms";
-import {User, ISocketPayload, MessageBody, IErrorPayload, IUserPayload} from "../models";
+import {User, ISocketPayload, MessageBody, IErrorPayload, ILoginData} from "../models";
 import {DataService} from "../data.service";
 import {Subscription} from "rxjs";
 import { Buffer } from 'buffer';
@@ -19,6 +19,7 @@ import { Buffer } from 'buffer';
 export class AuthComponent {
   public user:User = {};
   private subscription?: Subscription;
+  public online_user_ids?: number[];
 
   constructor(
     private httpClient: HttpClient,
@@ -32,6 +33,7 @@ export class AuthComponent {
   ngOnDestroy() {
     this.subscription?.unsubscribe()
     this.dataService.user = this.user;
+    this.dataService.online_user_ids = this.online_user_ids;
     this.dataService.socketService = this.socketService;
   }
 
@@ -76,25 +78,23 @@ export class AuthComponent {
 
     this.socketService.initialize(this.user)
     this.subscription = this.socketService.getEventListener()
-      .subscribe(async (value: { type: string, data: string }) => {
+      .subscribe(async (value: { type: string, data: ISocketPayload }) => {
         if (value.type == 'message') {
-          const jsonString = Buffer.from(value.data,'base64').toString()
-          var payload :ISocketPayload = JSON.parse(jsonString)
-          switch (payload.type) {
+          switch (value.data.type) {
             case 'login': {
-              this.user = (payload as IUserPayload).user
+              this.user = (value.data as ILoginData).user
+              this.online_user_ids = (value.data as ILoginData).online_user_ids
               await this.router.navigate(['chat']);
               break;
             }
             case 'error': {
               this.socketService.close()
               window.location.reload();
-              alert((payload as IErrorPayload).message)
+              alert((value.data as IErrorPayload).message)
               break;
             }
           }
-        } else
-          console.log(value)
+        }
       });
   }
 }
