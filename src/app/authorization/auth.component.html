@@ -2,36 +2,23 @@
   <mat-card>
     <mat-card-content>
       <form #regForm="ngForm" (ngSubmit)="register(regForm)">
-        <div *ngIf="user?.id">
           <p>
             <mat-form-field>
               <br>
               <mat-label>Username</mat-label>
-              <input ngModel readonly value="{{user.name}}" matInput>
+              <input ngModel value="{{user.username}}" name="username" matInput>
             </mat-form-field>
           </p>
           <p>
             <mat-form-field>
               <br>
-              <mat-label>Token</mat-label>
-              <input ngModel readonly value="{{user.id}}" matInput>
+              <mat-label>Password</mat-label>
+              <input ngModel value="{{user.password}}" name="password" matInput>
             </mat-form-field>
           </p>
-
-        </div>
-        <div *ngIf="!user?.id">
-        <p style="margin-top: 88px">
-          <mat-form-field>
-            <br>
-            <mat-label>Username</mat-label>
-            <input name="username" ngModel required #username="ngModel" matInput>
-          </mat-form-field>
-        </p>
-        </div>
         <p *ngIf="error" class="error">
           {{ error }}
         </p>
-
         <div class="button">
           <button type="submit" mat-button>Register</button>
         </div>
@@ -54,7 +41,7 @@
         <mat-form-field >
           <br>
           <mat-label>Login token</mat-label>
-          <input name="uuid" ngModel required type="password" #uuid="ngModel" matInput>
+          <input name="password" ngModel required type="password" #uuid="ngModel" matInput>
         </mat-form-field>
       </p>
 

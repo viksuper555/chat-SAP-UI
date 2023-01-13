@@ -1,7 +1,15 @@
 import { Component } from '@angular/core';
 import {DatePipe} from "@angular/common";
 import {SocketService} from "../socket.service";
-import {IMessageItem, MessageBody, User} from "../models";
+import {
+  IErrorPayload,
+  IMessageItem,
+  IMessagePayload,
+  IOnlinePayload,
+  ISocketPayload,
+  MessageBody,
+  User
+} from "../models";
 import {DataService} from "../data.service";
 import {Router} from "@angular/router";
 
@@ -55,15 +63,16 @@ export class ChatComponent {
     this.socketService.getEventListener()
       .subscribe((value:{ type: string, data: object }) => {
         if (value.type == 'message'){
-          let data = JSON.parse(value.data.toString())
-          switch (data.type){
+          switch ((value.data as ISocketPayload).type){
             case 'message':
             {
+              var data = (value.data as IMessagePayload)
               let msg: IMessageItem = {
-                user: data.sender_id,
+                user: data.sender_name,
                 message: data.message,
-                sentByMe: data.sender_id == this.user.name,
+                sentByMe: data.sender_name == this.user.username,
                 dateStr: this.datepipe.transform(new Date(data.timestamp*1000), 'HH:MM | MMM dd')!,
+                hub_id: 'test',
               }
               this.messageItems.push(msg)
               document.getElementById('send-Input')!.scrollIntoView({behavior: 'smooth'});
@@ -71,14 +80,15 @@ export class ChatComponent {
             }
             case 'online':
             {
-              this.onlineUsers = data.users.filter((obj: string | undefined) => {return obj !== this.user.name})
+              var users = (value.data as IOnlinePayload).users
+              this.onlineUsers = users.filter((obj: string | undefined) => {return obj !== this.user.username})
               break;
             }
             case 'error':
             {
               this.socketService.close()
               this.router.navigate(['auth'])
-              alert(data.message)
+              alert((value.data as IErrorPayload).message)
               break;
             }
           }

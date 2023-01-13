@@ -4,9 +4,10 @@ import {SocketService} from "../socket.service";
 import {DatePipe} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormControl, FormGroup, NgForm} from "@angular/forms";
-import {IMessageItem, User} from "../models";
+import {User, ISocketPayload, MessageBody, IErrorPayload, IUserPayload} from "../models";
 import {DataService} from "../data.service";
 import {Subscription} from "rxjs";
+import { Buffer } from 'buffer';
 
 @Component({
   selector: 'app-authorization',
@@ -48,15 +49,15 @@ export class AuthComponent {
   @Output() submitEM = new EventEmitter();
 
   async register(form: NgForm){
-    this.user.name = form.value.username
     var u: User = {
-      name: this.user!.name
+      username: form.value.username,
+      password: form.value.password
     }
     this.httpClient.post<User>('/api/register', {user:u})
       .subscribe(
         next => {
-          this.user.id = next?.id || ""
-          this.user.name = next?.name || ""
+          this.user.username = next?.username || ""
+          this.user.password = next?.password || ""
           alert("Successfully registered.")
         },
         error => {
@@ -65,31 +66,30 @@ export class AuthComponent {
   }
 
   async login(form: NgForm){
-    if (!form.value.uuid || !form.value.username)
+    if (!form.value.username || !form.value.password )
     {
       alert('Please enter credentials.')
       return
     }
-    this.user.id = form.value.uuid
-    this.user.name = form.value.username
+    this.user.username = form.value.username
+    this.user.password = form.value.password
 
     this.socketService.initialize(this.user)
     this.subscription = this.socketService.getEventListener()
-      .subscribe(async (value: { type: string, data: object }) => {
+      .subscribe(async (value: { type: string, data: string }) => {
         if (value.type == 'message') {
-          let data = JSON.parse(value.data.toString())
-          console.log(data)
-
-          switch (data.type) {
+          const jsonString = Buffer.from(value.data,'base64').toString()
+          var payload :ISocketPayload = JSON.parse(jsonString)
+          switch (payload.type) {
             case 'login': {
-              this.user = data.user
+              this.user = (payload as IUserPayload).user
               await this.router.navigate(['chat']);
               break;
             }
             case 'error': {
               this.socketService.close()
               window.location.reload();
-              alert(data.message)
+              alert((payload as IErrorPayload).message)
               break;
             }
           }

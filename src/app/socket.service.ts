@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { EventEmitter } from "@angular/core";
 import {MessageBody, User} from "./models";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: "root"
@@ -9,12 +10,14 @@ export class SocketService {
   private socket!: WebSocket;
   private listener!: EventEmitter<any>;
   private loginId?: string
-  public constructor() {}
+  public constructor(
+    private router: Router,
+  ) {}
 
   public initialize(u:User){
     this.listener = new EventEmitter();
-    this.loginId = u.id //TODO: Delete this
-    this.socket = new WebSocket("ws://localhost:9000/ws");
+    this.loginId = u.password //TODO: Delete this
+    this.socket = new WebSocket("ws://localhost:8080/ws");
     this.socket.onopen = event => {
       console.log('Socket open')
       this.listener.emit({ type: "open", data: event});
@@ -24,6 +27,7 @@ export class SocketService {
       console.log('Socket closing')
       this.listener.emit({ type: "close", data: event });
       this.close()
+      this.router.navigate(['auth'])
     };
     this.socket.onmessage = event => {
       this.listener.emit({ type: "message", data: JSON.parse(event.data) });
