@@ -6,7 +6,7 @@ import {
   IMessageItem,
   IMessagePayload,
   IOnlinePayload,
-  ISocketPayload, MessageBody,
+  ISocketPayload, MessageBody, Room,
   User
 } from "../models";
 import {DataService} from "../data.service";
@@ -23,19 +23,11 @@ export class ChatComponent {
   public recipients = <string[]>[];
   public onlineUsers = new Set<number>();
   public messageItems = <IMessageItem[]>[];
-  //region MI
-  // public messageItems:IMessageItem[] = [{
-  //   user: "Viktor",
-  //   message: "asdgfasdgasdfasdfasdfasdfaasdgfasdgasdfasdfasdfasdfasdfsadfsdfsaasdgfasdgasdfasdfasdfasdfasdfsadfdf",
-  //   sentByMe: true
-  // },{
-  //   user: "Ivan",
-  //   message: "asdgfasdgasdfasdfasdfasdfaasdgfasdgasdfasdfasdfasdfasdfsadfsdfsaasdgfasdgasdfasdfasdfasdfasdfsadfdf",
-  //   sentByMe: false
-  // }]
-  //endregion
-  public activeRoom = "Global Room";
-  public rooms = ["Global Room", "VP Room"]
+  public activeRoomId = "global";
+  public rooms = new Map<string, Room>([
+    ["global", {id: "global", name: "Global Room", messages: []}],
+    ["vp", {id: "vp", name: "VP Room", messages: []}]
+  ]);
   private socketService!:SocketService;
 
   constructor(
@@ -77,9 +69,11 @@ export class ChatComponent {
                 message: data.message,
                 sentByMe: data.sender_id == this.user.id,
                 dateStr: this.datepipe.transform(new Date(data.timestamp*1000), 'HH:mm | MMM dd')!,
-                hub_id: 'test',
+                room_id: data.room_id,
               }
-              this.messageItems.push(msg)
+              if(this.rooms.get(msg.room_id!)){
+                this.rooms.get(msg.room_id!)!.messages!.push(msg)
+              }
               document.getElementById('send-Input')!.scrollIntoView({behavior: 'smooth'});
               break;
             }
@@ -107,10 +101,17 @@ export class ChatComponent {
       });
   }
 
+  async selectRoom(roomId:string){
+    this.activeRoomId = roomId;
+  }
+
   async sendMessage(){
+    if (!this.message)
+      return
     let msg: MessageBody = {
       message: this.message,
       sender_id: this.user.id ?? 0,
+      room_id: this.activeRoomId,
       timestamp: Date.now(),
     };
     this.socketService.send(msg)

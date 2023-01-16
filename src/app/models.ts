@@ -10,14 +10,21 @@ export interface IMessageItem{
   message: string
   sentByMe: boolean
   dateStr?: string,
-  hub_id?: string,
+  room_id?: string,
 }
 
 export interface MessageBody{
   message: string
   sender_id: number,
   timestamp: number,
-  recipients?: string[]
+  room_id?: string,
+}
+
+export interface Room {
+  id: string,
+  name: string,
+  users?: User[]
+  messages?: IMessageItem[]
 }
 
 export interface ISocketPayload {
@@ -40,10 +47,11 @@ export interface IMessagePayload extends ISocketPayload{
   sender_name: string,
   timestamp: number,
   message: string,
-  recipients: number[]
+  room_id?: string,
 }
 
 export interface IOnlinePayload extends ISocketPayload{
   user_id: number
   connected: boolean
 }
+

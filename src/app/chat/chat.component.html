@@ -13,12 +13,12 @@
 
         <div class="messages-box">
           <div class="list-group rounded-0">
-            <div *ngFor="let room of rooms">
-              <a class="list-group-item list-group-item-action rounded-0" [ngClass]="(room==activeRoom)?'active text-white':'list-group-item-light'">
+            <div *ngFor="let room of rooms.values()">
+              <a (click)="selectRoom(room.id)" class="list-group-item list-group-item-action rounded-0" [ngClass]="(room.id == activeRoomId)?'active text-white':'list-group-item-light'">
                 <div class="media"><img src="/assets/room_icon.png" alt="user" width="50" class="rounded-circle">
                   <div class="media-body ml-4">
                     <div class="d-flex align-items-center justify-content-between mb-1">
-                      <h6 class="mb-0">{{ room }}</h6><small class="small font-weight-bold">25 Dec</small>
+                      <h6 class="mb-0">{{ room.name }}</h6><small class="small font-weight-bold">25 Dec</small>
                     </div>
                     <p class="font-italic mb-0 text-small">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>
                   </div>
@@ -33,7 +33,7 @@
     <div class="col-7 px-0">
       <div class="px-4 py-5 chat-box bg-white">
         <!-- Sender Message-->
-        <div *ngFor="let item of messageItems">
+        <div *ngFor="let item of rooms.get(activeRoomId)!.messages">
           <div class="media w-50 mb-3" [ngClass]="item.sentByMe?'ml-auto margin-left':'flex'">
             <div *ngIf="!item.sentByMe">
               <img src="/assets/user_icon.png" alt="user" width="50" class="rounded-circle" style="margin-right: 16px" >
