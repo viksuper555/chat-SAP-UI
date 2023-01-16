@@ -15,6 +15,8 @@ export interface IMessageItem{
 
 export interface MessageBody{
   message: string
+  sender_id: number,
+  timestamp: number,
   recipients?: string[]
 }
 

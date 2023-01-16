@@ -9,14 +9,12 @@ import {Router} from "@angular/router";
 export class SocketService {
   private socket!: WebSocket;
   private listener!: EventEmitter<any>;
-  private loginId?: string
   public constructor(
     private router: Router,
   ) {}
 
   public initialize(u:User){
     this.listener = new EventEmitter();
-    this.loginId = u.password //TODO: Delete this
     this.socket = new WebSocket("ws://localhost:8080/ws");
     this.socket.onopen = event => {
       console.log('Socket open')

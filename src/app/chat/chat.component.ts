@@ -6,8 +6,7 @@ import {
   IMessageItem,
   IMessagePayload,
   IOnlinePayload,
-  ISocketPayload,
-  MessageBody,
+  ISocketPayload, MessageBody,
   User
 } from "../models";
 import {DataService} from "../data.service";
@@ -60,6 +59,10 @@ export class ChatComponent {
     }
   }
 
+  ngOnDestroy(){
+    this.socketService.close()
+  }
+
   async subscribeToMessages(){
     this.socketService.getEventListener()
       .subscribe((value:{ type: string, data: object }) => {
@@ -106,7 +109,9 @@ export class ChatComponent {
 
   async sendMessage(){
     let msg: MessageBody = {
-      message: this.message
+      message: this.message,
+      sender_id: this.user.id ?? 0,
+      timestamp: Date.now(),
     };
     this.socketService.send(msg)
     this.message = ''
