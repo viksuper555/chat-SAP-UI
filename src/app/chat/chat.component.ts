@@ -72,6 +72,7 @@ export class ChatComponent implements OnInit, OnDestroy{
             r.messages?.forEach(m=>{
               m.senderName = uMap.get(m.userId)?.name
               m.sentByMe = m.userId == this.user.id
+              m.dateStr = this.datepipe.transform(m.date) ?? undefined
             })
           })
           this.rooms = new Map(r.map(x => [x.id, x]));
