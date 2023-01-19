@@ -1,34 +1,36 @@
 export interface User{
-  id?:number,
-  username?:string,
+  id?:number
+  name?:string
   password?:string
 }
 
 export interface IMessageItem{
-  sender_id: number
-  sender_name: string
-  message: string
-  sentByMe: boolean
-  dateStr?: string,
-  room_id?: string,
+  id?: number
+  userId: number
+  senderName?: string
+  text?: string
+  sentByMe?: boolean
+  date?: Date
+  dateStr?: string
+  roomId?: string
 }
 
 export interface MessageBody{
   message: string
-  sender_id: number,
-  timestamp: number,
-  room_id?: string,
+  sender_id: number
+  timestamp: number
+  room_id?: string
 }
 
 export interface Room {
-  id: string,
-  name: string,
+  id: string
+  name: string
   users?: User[]
   messages?: IMessageItem[]
 }
 
 export interface ISocketPayload {
-  type: string,
+  type: string
   data: object
 }
 
@@ -42,16 +44,15 @@ export interface ILoginData extends ISocketPayload{
 }
 
 export interface IMessagePayload extends ISocketPayload{
-  type: string,
-  sender_id: number,
-  sender_name: string,
-  timestamp: number,
-  message: string,
-  room_id?: string,
+  type: string
+  sender_id: number
+  sender_name: string
+  timestamp: number
+  message: string
+  room_id?: string
 }
 
 export interface IOnlinePayload extends ISocketPayload{
   user_id: number
   connected: boolean
 }
-

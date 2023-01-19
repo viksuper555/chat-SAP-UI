@@ -17,18 +17,15 @@ export class SocketService {
     this.listener = new EventEmitter();
     this.socket = new WebSocket("ws://localhost:8080/ws");
     this.socket.onopen = event => {
-      console.log('Socket open')
       this.listener.emit({ type: "open", data: event});
       this.socket.send(JSON.stringify({user:u}));
     };
     this.socket.onclose = event => {
-      console.log('Socket closing')
       this.listener.emit({ type: "close", data: event });
       this.close()
       this.router.navigate(['auth'])
     };
     this.socket.onmessage = event => {
-      console.log('Message: ', JSON.parse(event.data))
       this.listener.emit({ type: "message", data: JSON.parse(event.data) });
     };
   }

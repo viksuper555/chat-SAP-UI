@@ -11,6 +11,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^15.0.0",
+    "@angular/cdk": "^15.1.0",
     "@angular/common": "^15.0.0",
     "@angular/compiler": "^15.0.0",
     "@angular/core": "^15.0.0",
@@ -19,12 +20,16 @@
     "@angular/platform-browser": "^15.0.0",
     "@angular/platform-browser-dynamic": "^15.0.0",
     "@angular/router": "^15.0.0",
+    "@apollo/client": "^3.0.0",
+    "apollo-angular": "^4.2.0",
     "bootstrap": "^5.2.3",
+    "core-js": "^2.5.7",
+    "graphql": "^16",
     "jquery": "^3.6.1",
     "jquery-slim": "^3.0.0",
-    "core-js": "^2.5.7",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
+    "yarn": "^1.22.19",
     "zone.js": "~0.12.0"
   },
   "devDependencies": {

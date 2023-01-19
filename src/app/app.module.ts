@@ -12,7 +12,10 @@ import {MatCardModule} from "@angular/material/card";
 import {MaterialModule} from "./material.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {DataService} from "./data.service";
-import {ClipboardModule} from "@angular/cdk/clipboard";
+import { GraphQLModule } from './graphql.module';
+import {APOLLO_OPTIONS} from "apollo-angular";
+import {HttpLink} from "apollo-angular/http";
+import {InMemoryCache} from "@apollo/client/core";
 
 @NgModule({
   declarations: [
@@ -29,9 +32,20 @@ import {ClipboardModule} from "@angular/cdk/clipboard";
     MatCardModule,
     MaterialModule,
     BrowserAnimationsModule,
-    ClipboardModule
+    GraphQLModule,
   ],
-  providers: [DatePipe, DataService],
+  providers: [{
+    provide: APOLLO_OPTIONS,
+    useFactory: (httpLink: HttpLink) => {
+      return {
+        cache: new InMemoryCache(),
+        link: httpLink.create({
+          uri: 'http://localhost:4200/graph/api',
+        }),
+      };
+    },
+    deps: [HttpLink],
+  },DatePipe, DataService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

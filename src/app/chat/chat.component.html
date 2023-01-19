@@ -1,6 +1,6 @@
 <div class="container py-5 px-4">
   <div>
-    <p class="h5 mb-0 py-1 text-white" style="text-align: right">Hello, {{ user?.username }} 👋</p>
+    <p class="h5 mb-0 py-1 text-white" style="text-align: right">Hello, {{ user?.name }} 👋</p>
   </div>
   <div class="row rounded-lg overflow-hidden shadow">
     <!-- Users box-->
@@ -13,12 +13,13 @@
 
         <div class="messages-box">
           <div class="list-group rounded-0">
-            <div *ngFor="let room of rooms.values()">
-              <a (click)="selectRoom(room.id)" class="list-group-item list-group-item-action rounded-0" [ngClass]="(room.id == activeRoomId)?'active text-white':'list-group-item-light'">
+            <div *ngFor="let room of rooms | keyvalue">
+              <a (click)="selectRoom(room.key)" class="list-group-item list-group-item-action rounded-0" [ngClass]="(room.key == activeRoomId)?'active text-white':'list-group-item-light'">
                 <div class="media"><img src="/assets/room_icon.png" alt="user" width="50" class="rounded-circle">
+                  <button class="close" style="float: right;width: 30px;" mat-button (click)="onLeaveClick(room.key)">X</button>
                   <div class="media-body ml-4">
                     <div class="d-flex align-items-center justify-content-between mb-1">
-                      <h6 class="mb-0">{{ room.name }}</h6><small class="small font-weight-bold">25 Dec</small>
+                      <h6 class="mb-0">{{ room.value.name }}</h6><small class="small font-weight-bold">25 Dec</small>
                     </div>
                     <p class="font-italic mb-0 text-small">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>
                   </div>
@@ -38,13 +39,13 @@
             <div *ngIf="!item.sentByMe">
               <img src="/assets/user_icon.png" alt="user" width="50" class="rounded-circle" style="margin-right: 16px" >
               <div class="flex" style="align-items:baseline">
-                <span [ngClass]="(onlineUsers.has(item.sender_id)?'online':'')"></span>
-                <p style="padding-right: 16px;text-align: center;"> {{ item.sender_name }}</p>
+                <span [ngClass]="(onlineUsers.has(item.userId)?'online':'')"></span>
+                <p style="padding-right: 16px;text-align: center;"> {{ item.senderName }}</p>
               </div>
             </div>
             <div class="media-body" [ngClass]="item.sentByMe?'':'ml-3'">
               <div class="rounded py-2 px-3 mb-2 wrap" [ngClass]="item.sentByMe?'bg-primary':'bg-light'">
-                <p class="text-small mb-0" [ngClass]="item.sentByMe?'text-white':'text-muted'">{{ item.message }}</p>
+                <p class="text-small mb-0" [ngClass]="item.sentByMe?'text-white':'text-muted'">{{ item.text }}</p>
               </div>
               <p class="small text-muted">{{ item.dateStr }}</p>
             </div>

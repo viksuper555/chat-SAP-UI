@@ -6,14 +6,14 @@
             <mat-form-field>
               <br>
               <mat-label>Username</mat-label>
-              <input ngModel value="{{user.username}}" name="username" matInput>
+              <input ngModel value="{{user.name}}" name="name" matInput>
             </mat-form-field>
           </p>
           <p>
             <mat-form-field>
               <br>
               <mat-label>Password</mat-label>
-              <input ngModel value="{{user.password}}" name="password" matInput>
+              <input ngModel value="{{user.password}}" type="password" name="password" matInput>
             </mat-form-field>
           </p>
         <p *ngIf="error" class="error">
@@ -34,14 +34,14 @@
         <mat-form-field>
           <br>
           <mat-label>Username</mat-label>
-          <input name="username" ngModel required #username="ngModel" matInput>
+          <input name="name" ngModel required #name="ngModel" matInput>
         </mat-form-field>
       </p>
       <p>
         <mat-form-field >
           <br>
           <mat-label>Login token</mat-label>
-          <input name="password" ngModel required type="password" #uuid="ngModel" matInput>
+          <input name="password" ngModel required type="password" #password="ngModel" matInput>
         </mat-form-field>
       </p>
 

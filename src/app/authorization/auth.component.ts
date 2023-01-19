@@ -52,13 +52,13 @@ export class AuthComponent {
 
   async register(form: NgForm){
     var u: User = {
-      username: form.value.username,
+      name: form.value.name,
       password: form.value.password
     }
     this.httpClient.post<User>('/api/register', {user:u})
       .subscribe(
         next => {
-          this.user.username = next?.username || ""
+          this.user.name = next?.name || ""
           this.user.password = next?.password || ""
           alert("Successfully registered.")
         },
@@ -68,12 +68,12 @@ export class AuthComponent {
   }
 
   async login(form: NgForm){
-    if (!form.value.username || !form.value.password )
+    if (!form.value.name || !form.value.password )
     {
       alert('Please enter credentials.')
       return
     }
-    this.user.username = form.value.username
+    this.user.name = form.value.name
     this.user.password = form.value.password
 
     this.socketService.initialize(this.user)
