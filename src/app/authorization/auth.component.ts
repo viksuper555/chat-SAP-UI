@@ -7,7 +7,6 @@ import {FormControl, FormGroup, NgForm} from "@angular/forms";
 import {User, ISocketPayload, IErrorPayload, ILoginData} from "../models";
 import {DataService} from "../data.service";
 import {Subscription} from "rxjs";
-import { Buffer } from 'buffer';
 
 @Component({
   selector: 'app-authorization',

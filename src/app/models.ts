@@ -25,6 +25,8 @@ export interface MessageBody{
 export interface Room {
   id: string
   name: string
+  description?: string
+  lastMsgDate?: Date
   users?: User[]
   messages?: IMessageItem[]
 }

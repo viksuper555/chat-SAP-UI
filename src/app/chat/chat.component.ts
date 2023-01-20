@@ -26,15 +26,14 @@ import {normalizeSourceMaps} from "@angular-devkit/build-angular/src/utils";
 })
 export class ChatComponent implements OnInit, OnDestroy{
   public message = ''
+  public joinCode = ''
+  public roomName = ''
   public user!:User;
   public recipients = <string[]>[];
   public onlineUsers = new Set<number>();
   public messageItems = <IMessageItem[]>[];
-  public activeRoomId = "global";
-  public rooms = new Map<string, Room>([
-    ["global", {id: "global", name: "Global Room", messages: []}],
-    ["vp", {id: "vp", name: "VP Room", messages: []}]
-  ]);
+  public activeRoomId = 0;
+  public rooms = <Room[]>[];
   private socketService!:SocketService;
 
   constructor(
@@ -53,30 +52,7 @@ export class ChatComponent implements OnInit, OnDestroy{
       this.onlineUsers = new Set(this.dataService.online_user_ids!)
       this.socketService = this.dataService.socketService
 
-      // this.querySubscription = this.apollo.watchQuery<any>({
-      //   query: GET_USERS
-      // })
-      //   .valueChanges
-      //   .subscribe(({data, loading}) => {
-      //     console.log(data);
-      //   });
-      this.querySubscription = this.apollo.watchQuery<any>({
-        query: GET_ROOMS,
-        variables: {userId: 6}
-      })
-        .valueChanges
-        .subscribe(({data, loading}) => {
-          var r:Room[] = JSON.parse(JSON.stringify(data.getRooms));
-          const uMap: Map<number, User> = (new Map(r[0].users!.map(x => [x.id!, x])))
-          r.forEach(r =>{
-            r.messages?.forEach(m=>{
-              m.senderName = uMap.get(m.userId)?.name
-              m.sentByMe = m.userId == this.user.id
-              m.dateStr = this.datepipe.transform(m.date) ?? undefined
-            })
-          })
-          this.rooms = new Map(r.map(x => [x.id, x]));
-        });
+      this.loadRooms();
 
       this.subscribeToMessages()
     }
@@ -110,8 +86,9 @@ export class ChatComponent implements OnInit, OnDestroy{
                 dateStr: this.datepipe.transform(new Date(data.timestamp*1000), 'HH:mm | MMM dd')!,
                 roomId: data.room_id,
               }
-              if(this.rooms.get(msg.roomId!)){
-                this.rooms.get(msg.roomId!)!.messages!.push(msg)
+              let r = this.rooms.find(r => r.id == msg.roomId!)
+              if(r){
+                r.messages!.push(msg)
               }
               document.getElementById('send-Input')!.scrollIntoView({behavior: 'smooth'});
               break;
@@ -140,33 +117,92 @@ export class ChatComponent implements OnInit, OnDestroy{
       });
   }
 
-  async selectRoom(roomId:string){
+  async selectRoom(roomId:number){
     this.activeRoomId = roomId;
   }
+  async loadRooms(){
+    this.querySubscription = this.apollo.watchQuery<any>({
+      query: GET_ROOMS,
+      variables: {userId: this.user.id}
+    })
+      .valueChanges
+      .subscribe(({data, loading}) => {
+        var r:Room[] = JSON.parse(JSON.stringify(data.getRooms));
+        const uMap: Map<number, User> = (new Map(r[0].users!.map(x => [x.id!, x])))
+        r.forEach(r =>{
+          let msgCount = r.messages?.length!
+          if (msgCount){
+            r.lastMsgDate = r.messages![msgCount-1].date
+          }
+          r.description = r.users?.map(a => ` ${a.name}`).toString()
+          r.messages?.forEach(m=>{
+            m.senderName = uMap.get(m.userId)?.name
+            m.sentByMe = m.userId == this.user.id
+            m.dateStr = this.datepipe.transform(m.date, 'HH:mm | MMM dd') ?? undefined
+          })
+        })
+        r = r.sort((r1,r2) => {
+          if (r1.lastMsgDate! < r2.lastMsgDate!) {
+            return 1;
+          }
 
+          if (r1.lastMsgDate! > r2.lastMsgDate!) {
+            return -1;
+          }
+
+          return 0;
+        });
+        this.activeRoomId = 0
+        this.rooms = r
+      });
+  }
   async sendMessage(){
     if (!this.message)
       return
     let msg: MessageBody = {
       message: this.message,
       sender_id: this.user.id ?? 0,
-      room_id: this.activeRoomId,
+      room_id: this.rooms[this.activeRoomId].id,
       timestamp: Date.now(),
     };
+    this.rooms[this.activeRoomId].lastMsgDate = new Date(msg.timestamp)
     this.socketService.send(msg)
     this.message = ''
   }
+  async joinRoom(roomId?: string) {
+    if(roomId == "")
+      return
+    this.joinCode = ''
+    this.httpClient.post<User>('/api/join', {user_id: this.user.id, room_id: roomId})
+      .subscribe(
+        next => {
+          this.loadRooms()
+        },
+        error => {
+          alert(error.error)
+        })
+  }
+  async createRoom(roomName?: string){
 
-  async onLeaveClick(roomId?: string) {
+  }
+  async leaveRoom(roomId?: string) {
     if(roomId == "")
       return
     this.httpClient.post<User>('/api/leave', {user_id: this.user.id, room_id: roomId})
       .subscribe(
         next => {
-          this.rooms.delete(roomId!)
-        },
+          this.rooms = this.rooms.filter(function( r ) {
+              return r.id !== roomId;
+            });
+          this.activeRoomId = 0;
+          },
         error => {
           alert(error.error)
         })
+  }
+  createLastMsgDate(date:Date | undefined){
+    if(!date)
+      return ""
+    return this.datepipe.transform(date, 'dd MMM') ?? "25 Dec"
   }
 }

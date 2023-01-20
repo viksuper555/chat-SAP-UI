@@ -7,21 +7,35 @@
     <div class="col-5 px-0">
       <div class="bg-white">
 
-        <div class="bg-gray px-4 py-2 bg-light">
-          <p class="h5 mb-0 py-1">Recent</p>
+        <div class="bg-gray px-4 py-2 bg-light" style="display: flex;">
+          <div style="margin-right: 50px">
+            <p class="h5 mb-0 py-1">Recent</p>
+          </div>
+          <div class="input-group mb-3" style="float:right; display: contents">
+            <input type="text" class="form-control" placeholder="Enter room code" aria-label="Room's join code"
+                   aria-describedby="button-join-room" [(ngModel)]="joinCode" (keydown.enter)='joinRoom(joinCode)' />
+            <button class="btn btn-outline-primary" type="button" id="button-join-room" (click)="joinRoom(joinCode)">
+              Join
+            </button>
+            <input type="text" class="form-control" placeholder="Enter room name" aria-label="Room name"
+                   aria-describedby="button-create-room" [(ngModel)]="roomName" (keydown.enter)='createRoom(roomName)' />
+            <button class="btn btn-outline-primary" type="button" id="button-create-room" (click)="createRoom(roomName)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
         </div>
 
         <div class="messages-box">
           <div class="list-group rounded-0">
-            <div *ngFor="let room of rooms | keyvalue">
-              <a (click)="selectRoom(room.key)" class="list-group-item list-group-item-action rounded-0" [ngClass]="(room.key == activeRoomId)?'active text-white':'list-group-item-light'">
+            <div *ngFor="let room of rooms; let i = index" [attr.data-index]="i">
+              <a (click)="selectRoom(i)" class="list-group-item list-group-item-action rounded-0" [ngClass]="(i == activeRoomId)?'active text-white':'list-group-item-light'">
                 <div class="media"><img src="/assets/room_icon.png" alt="user" width="50" class="rounded-circle">
-                  <button class="close" style="float: right;width: 30px;" mat-button (click)="onLeaveClick(room.key)">X</button>
+                  <button class="close" style="float: right;width: 30px;" mat-button (click)="leaveRoom(room.id)">X</button>
                   <div class="media-body ml-4">
                     <div class="d-flex align-items-center justify-content-between mb-1">
-                      <h6 class="mb-0">{{ room.value.name }}</h6><small class="small font-weight-bold">25 Dec</small>
+                      <h6 class="mb-0">{{ room.name }}</h6><small class="small font-weight-bold">{{ createLastMsgDate(room.lastMsgDate) }}</small>
                     </div>
-                    <p class="font-italic mb-0 text-small">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>
+                    <p class="font-italic mb-0 text-small">{{ room.description}}</p>
                   </div>
                 </div>
               </a>
@@ -31,10 +45,10 @@
       </div>
     </div>
     <!-- Chat Box-->
-    <div class="col-7 px-0" >
-      <div class="px-4 py-5 chat-box bg-white">
+    <div class="col-7 px-0" *ngIf="rooms.length > 0">
+      <div class="px-4 py-5 chat-box bg-white" style="height: 564px;">
         <!-- Sender Message-->
-        <div *ngFor="let item of rooms.get(activeRoomId)!.messages">
+        <div *ngFor="let item of rooms[activeRoomId].messages">
           <div class="media w-50 mb-3" [ngClass]="item.sentByMe?'ml-auto margin-left':'flex'">
             <div *ngIf="!item.sentByMe">
               <img src="/assets/user_icon.png" alt="user" width="50" class="rounded-circle" style="margin-right: 16px" >
