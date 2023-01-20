@@ -14,7 +14,7 @@ import { Apollo, gql } from 'apollo-angular'
 import {DataService} from "../data.service";
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
-import {GET_ROOMS, GET_USERS} from "../../queries";
+import {CREATE_ROOM, GET_ROOMS, GET_USERS} from "../../queries";
 import {FetchPolicy} from "@apollo/client/core/watchQueryOptions";
 import {map, Subscription} from "rxjs";
 import {normalizeSourceMaps} from "@angular-devkit/build-angular/src/utils";
@@ -134,7 +134,7 @@ export class ChatComponent implements OnInit, OnDestroy{
           if (msgCount){
             r.lastMsgDate = r.messages![msgCount-1].date
           }
-          r.description = r.users?.map(a => ` ${a.name}`).toString()
+          r.description = this.createMsgDescription(r.users)
           r.messages?.forEach(m=>{
             m.senderName = uMap.get(m.userId)?.name
             m.sentByMe = m.userId == this.user.id
@@ -181,9 +181,31 @@ export class ChatComponent implements OnInit, OnDestroy{
         error => {
           alert(error.error)
         })
+    // TODO: Fix the same line above and remove this
+    this.loadRooms()
+
   }
   async createRoom(roomName?: string){
-
+    this.roomName = ''
+    this.apollo
+      .mutate({
+        mutation: CREATE_ROOM,
+        variables: {
+          input: {name: roomName, creatorId: this.user.id},
+        }
+      })
+      .subscribe(
+        ({ data, loading }) => {
+          // @ts-ignore
+          var r:Room = JSON.parse(JSON.stringify(data.createRoom));
+          r.description = this.createMsgDescription(r.users)
+          r.messages = []
+          this.rooms.push(r)
+        },
+        error => {
+          console.log('there was an error sending the query', error)
+        }
+      )
   }
   async leaveRoom(roomId?: string) {
     if(roomId == "")
@@ -204,5 +226,22 @@ export class ChatComponent implements OnInit, OnDestroy{
     if(!date)
       return ""
     return this.datepipe.transform(date, 'dd MMM') ?? "25 Dec"
+  }
+  createMsgDescription(users: User[] | undefined){
+    return users?.map(a => ` ${a.name}`).toString()
+  }
+  copyMessage(val: string){
+    const selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = val;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
+    alert('Room code copied to clipboard. \n' + "Code: " + val)
   }
 }

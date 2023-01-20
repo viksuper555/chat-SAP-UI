@@ -12,12 +12,12 @@
             <p class="h5 mb-0 py-1">Recent</p>
           </div>
           <div class="input-group mb-3" style="float:right; display: contents">
-            <input type="text" class="form-control" placeholder="Enter room code" aria-label="Room's join code"
+            <input type="text" class="form-control" placeholder="Enter room code" aria-label="Enter room code"
                    aria-describedby="button-join-room" [(ngModel)]="joinCode" (keydown.enter)='joinRoom(joinCode)' />
             <button class="btn btn-outline-primary" type="button" id="button-join-room" (click)="joinRoom(joinCode)">
               Join
             </button>
-            <input type="text" class="form-control" placeholder="Enter room name" aria-label="Room name"
+            <input type="text" class="form-control" placeholder="New room name" aria-label="Enter room name"
                    aria-describedby="button-create-room" [(ngModel)]="roomName" (keydown.enter)='createRoom(roomName)' />
             <button class="btn btn-outline-primary" type="button" id="button-create-room" (click)="createRoom(roomName)">
               <i class="fa fa-plus"></i>
@@ -30,7 +30,10 @@
             <div *ngFor="let room of rooms; let i = index" [attr.data-index]="i">
               <a (click)="selectRoom(i)" class="list-group-item list-group-item-action rounded-0" [ngClass]="(i == activeRoomId)?'active text-white':'list-group-item-light'">
                 <div class="media"><img src="/assets/room_icon.png" alt="user" width="50" class="rounded-circle">
-                  <button class="close" style="float: right;width: 30px;" mat-button (click)="leaveRoom(room.id)">X</button>
+                  <button class="close" style="float: right;width: 10px;" mat-button (click)="leaveRoom(room.id)">X</button>
+                  <button (click)="copyMessage(room.id)" value="click to copy" mat-button >
+                    <i class="fa fa-user-plus"></i>
+                  </button>
                   <div class="media-body ml-4">
                     <div class="d-flex align-items-center justify-content-between mb-1">
                       <h6 class="mb-0">{{ room.name }}</h6><small class="small font-weight-bold">{{ createLastMsgDate(room.lastMsgDate) }}</small>

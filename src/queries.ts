@@ -27,3 +27,16 @@ export const GET_USERS = gql`
     }
   }
 `;
+
+export const CREATE_ROOM = gql`
+  mutation CreateRoom($input: NewRoom!) {
+    createRoom(input: $input){
+      id,
+      name,
+      users{
+        id,
+        name
+      }
+    }
+  }
+`;
