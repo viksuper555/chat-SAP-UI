@@ -10,14 +10,15 @@ import {
   User
 } from "../models";
 
-import { Apollo, gql } from 'apollo-angular'
+import {Apollo, gql, QueryRef} from 'apollo-angular'
 import {DataService} from "../data.service";
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {CREATE_ROOM, GET_ROOMS, GET_USERS} from "../../queries";
 import {FetchPolicy} from "@apollo/client/core/watchQueryOptions";
-import {map, Subscription} from "rxjs";
+import {map, Observable, Subscription} from "rxjs";
 import {normalizeSourceMaps} from "@angular-devkit/build-angular/src/utils";
+import {EmptyObject} from "apollo-angular/types";
 
 @Component({
   selector: 'app-chat',
@@ -43,7 +44,8 @@ export class ChatComponent implements OnInit, OnDestroy{
     public dataService: DataService,
     private router: Router,
   ) {}
-  private querySubscription!: Subscription;
+  private roomsSubscription!: Subscription;
+  private roomsQuery!: QueryRef<any>;
 
   ngOnInit(){
     if (this.dataService.user)
@@ -52,8 +54,7 @@ export class ChatComponent implements OnInit, OnDestroy{
       this.onlineUsers = new Set(this.dataService.online_user_ids!)
       this.socketService = this.dataService.socketService
 
-      this.loadRooms();
-
+      this.subscribeToRooms();
       this.subscribeToMessages()
     }
     else
@@ -67,7 +68,7 @@ export class ChatComponent implements OnInit, OnDestroy{
     if(!this.socketService)
       return
     this.socketService.close()
-    this.querySubscription.unsubscribe();
+    this.roomsSubscription.unsubscribe();
   }
 
   async subscribeToMessages(){
@@ -120,42 +121,55 @@ export class ChatComponent implements OnInit, OnDestroy{
   async selectRoom(roomId:number){
     this.activeRoomId = roomId;
   }
-  async loadRooms(){
-    this.querySubscription = this.apollo.watchQuery<any>({
+  async subscribeToRooms(){
+    this.roomsQuery = this.apollo.watchQuery<any>({
       query: GET_ROOMS,
-      variables: {userId: this.user.id}
+      variables: {userId: this.user.id},
+      pollInterval: 10000,
+      fetchPolicy: "no-cache"
     })
-      .valueChanges
+
+    this.roomsSubscription = this.roomsQuery.valueChanges
       .subscribe(({data, loading}) => {
         var r:Room[] = JSON.parse(JSON.stringify(data.getRooms));
-        const uMap: Map<number, User> = (new Map(r[0].users!.map(x => [x.id!, x])))
-        r.forEach(r =>{
-          let msgCount = r.messages?.length!
-          if (msgCount){
-            r.lastMsgDate = r.messages![msgCount-1].date
-          }
-          r.description = this.createMsgDescription(r.users)
-          r.messages?.forEach(m=>{
-            m.senderName = uMap.get(m.userId)?.name
-            m.sentByMe = m.userId == this.user.id
-            m.dateStr = this.datepipe.transform(m.date, 'HH:mm | MMM dd') ?? undefined
-          })
-        })
-        r = r.sort((r1,r2) => {
-          if (r1.lastMsgDate! < r2.lastMsgDate!) {
-            return 1;
-          }
-
-          if (r1.lastMsgDate! > r2.lastMsgDate!) {
-            return -1;
-          }
-
-          return 0;
-        });
-        this.activeRoomId = 0
-        this.rooms = r
+        this.parseRooms(r)
       });
   }
+  async refreshRooms(){
+    var a = await this.roomsQuery.refetch().then(x => {
+      var r:Room[] = JSON.parse(JSON.stringify(x.data.getRooms));
+      this.parseRooms(r)
+    });
+  }
+  parseRooms(rooms: Room[]){
+    const uMap: Map<number, User> = (new Map(rooms[0].users!.map(x => [x.id!, x])))
+    rooms.forEach(r =>{
+      let msgCount = r.messages?.length!
+      if (msgCount){
+        r.lastMsgDate = r.messages![msgCount-1].date
+      }
+      r.description = this.createMsgDescription(r.users)
+      r.messages?.forEach(m=>{
+        m.senderName = uMap.get(m.userId)?.name
+        m.sentByMe = m.userId == this.user.id
+        m.dateStr = this.datepipe.transform(m.date, 'HH:mm | MMM dd') ?? undefined
+      })
+    })
+    rooms = rooms.sort((r1,r2) => {
+      if (r1.lastMsgDate! < r2.lastMsgDate!) {
+        return 1;
+      }
+
+      if (r1.lastMsgDate! > r2.lastMsgDate!) {
+        return -1;
+      }
+
+      return 0;
+    });
+    this.activeRoomId = 0
+    this.rooms = rooms
+  }
+
   async sendMessage(){
     if (!this.message)
       return
@@ -173,17 +187,10 @@ export class ChatComponent implements OnInit, OnDestroy{
     if(roomId == "")
       return
     this.joinCode = ''
-    this.httpClient.post<User>('/api/join', {user_id: this.user.id, room_id: roomId})
-      .subscribe(
-        next => {
-          this.loadRooms()
-        },
-        error => {
-          alert(error.error)
-        })
-    // TODO: Fix the same line above and remove this
-    this.loadRooms()
-
+    this.httpClient.post('/api/join', {user_id: this.user.id, room_id: roomId})
+      .toPromise().then(() => {
+        this.refreshRooms()
+    });
   }
   async createRoom(roomName?: string){
     this.roomName = ''
