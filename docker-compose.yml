@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  angular-docker:
+    container_name: messenger_ui
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - '4200:4200'
+    command:
+      yarn start

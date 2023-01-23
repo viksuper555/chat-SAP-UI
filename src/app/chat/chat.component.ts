@@ -10,15 +10,12 @@ import {
   User
 } from "../models";
 
-import {Apollo, gql, QueryRef} from 'apollo-angular'
+import {Apollo, QueryRef} from 'apollo-angular'
 import {DataService} from "../data.service";
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
-import {CREATE_ROOM, GET_ROOMS, GET_USERS} from "../../queries";
-import {FetchPolicy} from "@apollo/client/core/watchQueryOptions";
-import {map, Observable, Subscription} from "rxjs";
-import {normalizeSourceMaps} from "@angular-devkit/build-angular/src/utils";
-import {EmptyObject} from "apollo-angular/types";
+import {CREATE_ROOM, GET_ROOMS} from "../../queries";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-chat',
@@ -90,6 +87,8 @@ export class ChatComponent implements OnInit, OnDestroy{
               let r = this.rooms.find(r => r.id == msg.roomId!)
               if(r){
                 r.messages!.push(msg)
+                if (r.id != this.rooms[this.activeRoomId].id)
+                  r.unread = true
               }
               document.getElementById('send-Input')!.scrollIntoView({behavior: 'smooth'});
               break;
@@ -120,6 +119,7 @@ export class ChatComponent implements OnInit, OnDestroy{
 
   async selectRoom(roomId:number){
     this.activeRoomId = roomId;
+    this.rooms[roomId].unread = false
   }
   async subscribeToRooms(){
     this.roomsQuery = this.apollo.watchQuery<any>({
@@ -142,12 +142,15 @@ export class ChatComponent implements OnInit, OnDestroy{
     });
   }
   parseRooms(rooms: Room[]){
+    var selectedId = this.rooms[this.activeRoomId]?.id
     const uMap: Map<number, User> = (new Map(rooms[0].users!.map(x => [x.id!, x])))
+    const unreadRooms = this.rooms.filter(r => r.unread).map(r => r.id)
     rooms.forEach(r =>{
       let msgCount = r.messages?.length!
       if (msgCount){
         r.lastMsgDate = r.messages![msgCount-1].date
       }
+      r.unread = unreadRooms.includes(r.id)
       r.description = this.createMsgDescription(r.users)
       r.messages?.forEach(m=>{
         m.senderName = uMap.get(m.userId)?.name
@@ -166,7 +169,8 @@ export class ChatComponent implements OnInit, OnDestroy{
 
       return 0;
     });
-    this.activeRoomId = 0
+    const selectedRoom = rooms.find(r => r.id == selectedId);
+    this.activeRoomId = selectedRoom ? rooms.indexOf(selectedRoom) : 0
     this.rooms = rooms
   }
 

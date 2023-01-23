@@ -16,9 +16,10 @@ import {Subscription} from "rxjs";
 
 
 export class AuthComponent {
-  public user:User = {};
   private subscription?: Subscription;
-  public online_user_ids?: number[];
+  public ShowLogin = false;
+  public User:User = {};
+  public OnlineUserIds?: number[];
 
   constructor(
     private httpClient: HttpClient,
@@ -31,8 +32,8 @@ export class AuthComponent {
 
   ngOnDestroy() {
     this.subscription?.unsubscribe()
-    this.dataService.user = this.user;
-    this.dataService.online_user_ids = this.online_user_ids;
+    this.dataService.user = this.User;
+    this.dataService.online_user_ids = this.OnlineUserIds;
     this.dataService.socketService = this.socketService;
   }
 
@@ -57,8 +58,8 @@ export class AuthComponent {
     this.httpClient.post<User>('/api/register', {user:u})
       .subscribe(
         next => {
-          this.user.name = next?.name || ""
-          this.user.password = next?.password || ""
+          this.User.name = next?.name || ""
+          this.User.password = next?.password || ""
           alert("Successfully registered.")
         },
         error => {
@@ -72,17 +73,17 @@ export class AuthComponent {
       alert('Please enter credentials.')
       return
     }
-    this.user.name = form.value.name
-    this.user.password = form.value.password
+    this.User.name = form.value.name
+    this.User.password = form.value.password
 
-    this.socketService.initialize(this.user)
+    this.socketService.initialize(this.User)
     this.subscription = this.socketService.getEventListener()
       .subscribe(async (value: { type: string, data: ISocketPayload }) => {
         if (value.type == 'message') {
           switch (value.data.type) {
             case 'login': {
-              this.user = (value.data as ILoginData).user
-              this.online_user_ids = (value.data as ILoginData).online_user_ids
+              this.User = (value.data as ILoginData).user
+              this.OnlineUserIds = (value.data as ILoginData).online_user_ids
               await this.router.navigate(['chat']);
               break;
             }
@@ -95,5 +96,9 @@ export class AuthComponent {
           }
         }
       });
+  }
+
+  toggleLogin(){
+    this.ShowLogin = !this.ShowLogin
   }
 }

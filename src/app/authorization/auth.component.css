@@ -24,8 +24,15 @@ mat-card-content {
 }
 
 .button {
+  margin-bottom: 10px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+}
+.click-here{
+  color:yellow;
+}
+.click-here:hover{
+  cursor: pointer;
 }
 .input_copy_wrapper{
   width: 450px;

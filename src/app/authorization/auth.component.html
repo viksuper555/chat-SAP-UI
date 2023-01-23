@@ -1,19 +1,19 @@
-<div>
+<div *ngIf="ShowLogin">
   <mat-card>
     <mat-card-content>
-      <form #regForm="ngForm" (ngSubmit)="register(regForm)">
+      <form #regForm="ngForm" (ngSubmit)="register(regForm)" style="text-align: -webkit-center;">
           <p>
             <mat-form-field>
               <br>
               <mat-label>Username</mat-label>
-              <input ngModel value="{{user.name}}" name="name" matInput>
+              <input ngModel value="{{User.name}}" name="name" matInput>
             </mat-form-field>
           </p>
           <p>
             <mat-form-field>
               <br>
               <mat-label>Password</mat-label>
-              <input ngModel value="{{user.password}}" type="password" name="password" matInput>
+              <input ngModel value="{{User.password}}" type="password" name="password" matInput>
             </mat-form-field>
           </p>
         <p *ngIf="error" class="error">
@@ -22,14 +22,15 @@
         <div class="button">
           <button type="submit" mat-button>Register</button>
         </div>
+        Already have account? <a (click)="toggleLogin()" class="click-here">Click here</a> to login.
       </form>
     </mat-card-content>
   </mat-card>
 </div>
-<div>
+<div *ngIf="!ShowLogin">
 <mat-card>
   <mat-card-content>
-    <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
+    <form #loginForm="ngForm" (ngSubmit)="login(loginForm)" style="text-align: -webkit-center;">
       <p>
         <mat-form-field>
           <br>
@@ -40,7 +41,7 @@
       <p>
         <mat-form-field >
           <br>
-          <mat-label>Login token</mat-label>
+          <mat-label>Password</mat-label>
           <input name="password" ngModel required type="password" #password="ngModel" matInput>
         </mat-form-field>
       </p>
@@ -52,7 +53,7 @@
       <div class="button">
         <button type="submit" mat-button>Login</button>
       </div>
-
+      Not registered? <a (click)="toggleLogin()" class="click-here">Click here</a> to register.
     </form>
   </mat-card-content>
 </mat-card>

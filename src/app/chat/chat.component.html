@@ -31,6 +31,7 @@
               <a (click)="selectRoom(i)" class="list-group-item list-group-item-action rounded-0" [ngClass]="(i == activeRoomId)?'active text-white':'list-group-item-light'">
                 <div class="media"><img src="/assets/room_icon.png" alt="user" width="50" class="rounded-circle">
                   <button class="close" style="float: right;width: 10px;" mat-button (click)="leaveRoom(room.id)">X</button>
+                  <span class="dot" *ngIf="room.unread"></span>
                   <button (click)="copyMessage(room.id)" value="click to copy" mat-button >
                     <i class="fa fa-clipboard"></i>
                   </button>

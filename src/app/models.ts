@@ -29,6 +29,7 @@ export interface Room {
   lastMsgDate?: Date
   users?: User[]
   messages?: IMessageItem[]
+  unread: boolean
 }
 
 export interface ISocketPayload {
