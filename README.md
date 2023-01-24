@@ -10,6 +10,9 @@ UI for ChatSAP project
 <img src="https://developers.redhat.com/sites/default/files/styles/article_feature/public/blog/2014/05/homepage-docker-logo.png?itok=zx0e-vcP" height="100">
 </p>
 
+## UI screenshot 
+![image](https://user-images.githubusercontent.com/15073936/214259705-4249c6b3-a68d-49b7-8019-137de611e130.png)
+
 ## Get started
 
 Run `ng s --proxy-config proxy.config.json` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
