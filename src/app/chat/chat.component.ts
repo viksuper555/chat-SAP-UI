@@ -136,12 +136,12 @@ export class ChatComponent implements OnInit, OnDestroy{
       });
   }
   async refreshRooms(){
-    var a = await this.roomsQuery.refetch().then(x => {
+    await this.roomsQuery.refetch().then(x => {
       var r:Room[] = JSON.parse(JSON.stringify(x.data.getRooms));
       this.parseRooms(r)
     });
   }
-  parseRooms(rooms: Room[]){
+  async parseRooms(rooms: Room[]){
     var selectedId = this.rooms[this.activeRoomId]?.id
     const uMap: Map<number, User> = (new Map(rooms[0].users!.map(x => [x.id!, x])))
     const unreadRooms = this.rooms.filter(r => r.unread).map(r => r.id)
@@ -158,17 +158,7 @@ export class ChatComponent implements OnInit, OnDestroy{
         m.dateStr = this.datepipe.transform(m.date, 'HH:mm | MMM dd') ?? undefined
       })
     })
-    rooms = rooms.sort((r1,r2) => {
-      if (r1.lastMsgDate! < r2.lastMsgDate!) {
-        return 1;
-      }
-
-      if (r1.lastMsgDate! > r2.lastMsgDate!) {
-        return -1;
-      }
-
-      return 0;
-    });
+    rooms = await this.sortRooms(rooms)
     const selectedRoom = rooms.find(r => r.id == selectedId);
     this.activeRoomId = selectedRoom ? rooms.indexOf(selectedRoom) : 0
     this.rooms = rooms
@@ -232,6 +222,19 @@ export class ChatComponent implements OnInit, OnDestroy{
         error => {
           alert(error.error)
         })
+  }
+  async sortRooms(rooms: Room[]){
+    return rooms.sort((r1,r2) => {
+      if (r1.lastMsgDate! < r2.lastMsgDate!) {
+        return 1;
+      }
+
+      if (r1.lastMsgDate! > r2.lastMsgDate!) {
+        return -1;
+      }
+
+      return 0;
+    });
   }
   createLastMsgDate(date:Date | undefined){
     if(!date)
