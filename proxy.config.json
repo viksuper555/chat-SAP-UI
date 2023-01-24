@@ -1,11 +1,11 @@
 {
   "/api/*":{
-  "target":"http://localhost:8080",
+  "target":"http://backend:8080",
   "secure": false,
     "logLevel": "debug"
   },
   "/graph/api/*":{
-    "target":"http://localhost:8080",
+    "target":"http://backend:8080",
     "secure": false,
     "logLevel": "debug"
   }

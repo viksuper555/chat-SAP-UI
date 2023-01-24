@@ -1,6 +1,7 @@
 FROM node:alpine AS messenger-ui
-WORKDIR /app
+WORKDIR /frontend
 COPY / ./
+
 COPY package*.json ./
 
 RUN npm install -g @angular/cli@15.1.2 && \
